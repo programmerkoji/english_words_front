@@ -1,15 +1,21 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
 import { useCallback, useState } from "react";
-import { Word } from "../types/word";
+import { Word, WordResponseApi } from "../types/word";
 
 export const useAllWords = () => {
-	const [words, setWords] = useState<Array<Word>>([]);
+  const [wordsData, setWordsData] = useState<WordResponseApi>({
+    current_page: 0,
+    data: [],
+    last_page: 0,
+    total: 0,
+  });
 
 	const getWords = useCallback(() => {
 		axios
-			.get("/words")
-			.then((res) => setWords(res.data.data))
+			.get<WordResponseApi>("/words")
+      .then((res) => setWordsData(res.data))
 			.catch(() => {});
 	}, []);
-	return { getWords, words };
+	return { getWords, wordsData };
 };

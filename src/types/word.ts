@@ -9,3 +9,10 @@ export type Word = {
   updated_at: string;
   deleted_at: string | null;
 };
+
+export type WordResponseApi = {
+  current_page: number;
+  data: Word[];
+  last_page: number;
+  total: number;
+}

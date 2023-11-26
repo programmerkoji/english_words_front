@@ -1,14 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
 import Word from "./Word";
 import { useAllWords } from "../hooks/useAllWords";
+import { Pagination } from "@mui/material";
 
 const Main = () => {
-	const { getWords, words } = useAllWords();
+	const { getWords, wordsData } = useAllWords();
+  console.log(wordsData);
 
 	useEffect(() => getWords(), []);
 
 	return (
-		<main>
+    <main>
 			<div className="py-12">
 				<div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
 					<div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -35,7 +38,7 @@ const Main = () => {
 
 								<div className="container mx-auto">
 									<ul className="flex flex-wrap -m-2">
-										{words.map((word) => (
+										{wordsData.data.map((word) => (
 											<Word
 												key={word.id}
 												word_en={word.word_en}
@@ -45,6 +48,9 @@ const Main = () => {
 									</ul>
 								</div>
 							</div>
+              <div className="mt-4 flex justify-center">
+                <Pagination count={wordsData.last_page} />
+              </div>
 						</div>
 					</div>
 				</div>
