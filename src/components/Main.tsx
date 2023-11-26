@@ -1,17 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Word from "./Word";
 import { useAllWords } from "../hooks/useAllWords";
 import { Pagination } from "@mui/material";
 
 const Main = () => {
 	const { getWords, wordsData } = useAllWords();
-  console.log(wordsData);
+	const [page, setPage] = React.useState(1);
 
-	useEffect(() => getWords(), []);
+	const handleChangePage = (
+		event: React.ChangeEvent<unknown>,
+		newPage: number
+	) => {
+		setPage(newPage);
+		getWords(newPage);
+	};
+
+	useEffect(() => getWords(page), [page]);
 
 	return (
-    <main>
+		<main>
 			<div className="py-12">
 				<div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
 					<div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -48,9 +56,13 @@ const Main = () => {
 									</ul>
 								</div>
 							</div>
-              <div className="mt-4 flex justify-center">
-                <Pagination count={wordsData.last_page} />
-              </div>
+							<div className="mt-4 flex justify-center">
+								<Pagination
+									count={wordsData.last_page}
+									page={page}
+									onChange={handleChangePage}
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
