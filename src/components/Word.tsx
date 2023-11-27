@@ -1,12 +1,36 @@
-import React, { FC } from "react";
+import {
+	Button,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
+} from "@mui/material";
+import React, { FC, useState } from "react";
 
 type Props = {
-  word_en: string;
-  created_at: string;
-}
+	word_id: number;
+	word_en: string;
+	created_at: string;
+	onDelete: (word_id: number) => void;
+};
 
-const Word:FC<Props> = (props) => {
-  const { word_en, created_at } = props;
+const Word: FC<Props> = (props) => {
+	const { word_id, word_en, created_at, onDelete } = props;
+	const [open, setOpen] = useState(false);
+
+	const handleDeleteClick = () => {
+		onDelete(word_id);
+		setOpen(false);
+	};
+	const handleClickAlart = () => setOpen(true);
+	const handleCloseAlart = () => setOpen(false);
+
+	const date = new Date(created_at);
+	const formattedCreatedData = date.toLocaleString("ja-JP", {
+		timeZone: "Asia/Tokyo",
+	});
+
 	return (
 		<li className="w-full xl:w-1/3 md:w-1/2 p-2">
 			<div className="border border-gray-200 p-3 rounded-lg flex flex-wrap items-center justify-between">
@@ -32,35 +56,42 @@ const Word:FC<Props> = (props) => {
 				</div>
 				<div className="w-1/4">
 					<div className="text-right">
-						<a
-							href="https://from-forties.net/english-words/words/23/edit"
-							className="mx-auto text-white bg-indigo-500 border-0 py-1 px-4 focus:outline-none hover:bg-indigo-600 rounded text-sm"
-						>
+						<button className="mx-auto text-white bg-indigo-500 border-0 py-1 px-4 focus:outline-none hover:bg-indigo-600 rounded text-sm">
 							編集
-						</a>
+						</button>
 					</div>
-					<form
-						id="delete_23"
-						method="post"
-						action="https://from-forties.net/english-words/words/23"
-						className="text-right mt-2"
-					>
-						<input
-							type="hidden"
-							name="_token"
-							value="M65f3DLicfo4cYO0tTqEkPPNxQXMzK6y7cULrIkV"
-						/>{" "}
-						<input type="hidden" name="_method" value="delete" />{" "}
-						<span
-							data-id="23"
+					<div className="text-right mt-2">
+						<button
+							onClick={handleClickAlart}
 							className="mx-auto text-white bg-red-500 border-0 py-1 px-4 focus:outline-none hover:bg-red-600 rounded text-sm"
 						>
 							削除
-						</span>
-					</form>
+						</button>
+						<Dialog
+							open={open}
+							onClose={handleCloseAlart}
+							aria-labelledby="単語削除"
+							aria-describedby="クリックした単語を削除します"
+						>
+							<DialogTitle id="alert-dialog-title">
+								{"本当に単語を削除しますか？"}
+							</DialogTitle>
+							<DialogContent>
+								<DialogContentText id="alert-dialog-description">
+									一度削除すると、元に戻せなくなります。
+								</DialogContentText>
+							</DialogContent>
+							<DialogActions>
+								<Button onClick={handleCloseAlart}>やっぱりやめる</Button>
+								<Button onClick={handleDeleteClick} autoFocus>
+									削除する
+								</Button>
+							</DialogActions>
+						</Dialog>
+					</div>
 				</div>
 				<div className="w-full text-right mt-3">
-          <p className="text-sm">登録：{ created_at }</p>
+					<p className="text-sm">登録：{formattedCreatedData}</p>
 				</div>
 			</div>
 		</li>

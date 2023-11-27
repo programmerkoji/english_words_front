@@ -2,11 +2,24 @@
 import React, { useEffect, useState } from "react";
 import Word from "./Word";
 import { useAllWords } from "../hooks/useAllWords";
-import { Pagination } from "@mui/material";
+import {
+	Dialog,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
+	Pagination,
+	TextField,
+} from "@mui/material";
+import axios from "axios";
+import { WordResponseApi } from "../types/word";
 
 const Main = () => {
 	const { getWords, wordsData } = useAllWords();
-	const [page, setPage] = React.useState(1);
+	const [page, setPage] = useState(1);
+	const [open, setOpen] = useState(false);
+
+	const handleOpen = () => setOpen(true);
+	const handleClose = () => setOpen(false);
 
 	const handleChangePage = (
 		event: React.ChangeEvent<unknown>,
@@ -14,6 +27,13 @@ const Main = () => {
 	) => {
 		setPage(newPage);
 		getWords(newPage);
+	};
+
+	const handleDelete = async (word_id: number) => {
+		try {
+			await axios.delete<WordResponseApi>(`/words/${word_id}`);
+			getWords(page);
+		} catch (error) {}
 	};
 
 	useEffect(() => getWords(page), [page]);
@@ -27,9 +47,39 @@ const Main = () => {
 							<div className="text-gray-600 body-font">
 								<div className="mb-4"></div>
 								<div className="mb-6 flex items-center flex-wrap gap-4">
-									<span className="inline-block text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
+									<button
+										onClick={handleOpen}
+										className="inline-block text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
+									>
 										単語を登録
-									</span>
+									</button>
+									<Dialog open={open} onClose={handleClose}>
+										<DialogTitle>新規登録</DialogTitle>
+										<DialogContent>
+											<DialogContentText>
+												To subscribe to this website, please enter your email
+												address here. We will send updates occasionally.
+											</DialogContentText>
+											<TextField
+												autoFocus
+												margin="dense"
+												id="word_en"
+												label="英単語"
+												type="text"
+												fullWidth
+												variant="standard"
+											/>
+											<TextField
+												autoFocus
+												margin="dense"
+												id="word_ja"
+												label="日本語訳"
+												type="text"
+												fullWidth
+												variant="standard"
+											/>
+										</DialogContent>
+									</Dialog>
 									<div className="md:ml-auto flex justify-end gap-2">
 										<select name="memory_search" id="memory_search">
 											<option value="">記憶度</option>
@@ -49,8 +99,10 @@ const Main = () => {
 										{wordsData.data.map((word) => (
 											<Word
 												key={word.id}
+												word_id={word.id}
 												word_en={word.word_en}
 												created_at={word.created_at}
+												onDelete={handleDelete}
 											/>
 										))}
 									</ul>
