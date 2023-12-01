@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { WordResponseApi } from "../types/word";
 
 export const useAllWords = () => {
@@ -11,14 +11,13 @@ export const useAllWords = () => {
 		total: 0,
   });
 
-	const getWords = useCallback((currentPage: number) => {
-		axios
-			.get<WordResponseApi>(`/words?page=${currentPage}`)
-			.then((res) => {
-        setWordsData(res.data)
-        console.log(res.data);
-			})
-			.catch(() => {});
-	}, []);
-	return { getWords, wordsData };
+	const fetchPost = async (currentPage: number) => {
+		try {
+			const responce = await axios.get<WordResponseApi>(`/words?page=${currentPage}`);
+			setWordsData(responce.data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	return { fetchPost, wordsData };
 };

@@ -14,7 +14,7 @@ import axios from "axios";
 import { WordResponseApi } from "../types/word";
 
 const Main = () => {
-	const { getWords, wordsData } = useAllWords();
+	const { fetchPost, wordsData } = useAllWords();
 	const [page, setPage] = useState(1);
 	const [open, setOpen] = useState(false);
 
@@ -26,17 +26,19 @@ const Main = () => {
 		newPage: number
 	) => {
 		setPage(newPage);
-		getWords(newPage);
+		fetchPost(newPage);
 	};
 
 	const handleDelete = async (word_id: number) => {
 		try {
 			await axios.delete<WordResponseApi>(`/words/${word_id}`);
-			getWords(page);
+			fetchPost(page);
 		} catch (error) {}
 	};
 
-	useEffect(() => getWords(page), [page]);
+	useEffect(() => {
+		fetchPost(page);
+	}, [page]);
 
 	return (
 		<main>
