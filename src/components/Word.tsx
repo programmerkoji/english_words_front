@@ -7,6 +7,7 @@ import {
 	DialogTitle,
 } from "@mui/material";
 import React, { FC, useState } from "react";
+import Delete from "./Delete";
 
 type Props = {
 	word_id: number;
@@ -17,14 +18,10 @@ type Props = {
 
 const Word: FC<Props> = (props) => {
 	const { word_id, word_en, created_at, onDelete } = props;
-	const [open, setOpen] = useState(false);
 
-	const handleDeleteClick = () => {
-		onDelete(word_id);
-		setOpen(false);
-	};
-	const handleClickAlart = () => setOpen(true);
-	const handleCloseAlart = () => setOpen(false);
+	const handleClickAnswer = () => {
+		console.log(word_id);
+	}
 
 	const date = new Date(created_at);
 	const formattedCreatedData = date.toLocaleString("ja-JP", {
@@ -46,12 +43,12 @@ const Word: FC<Props> = (props) => {
 						<p className="text-lg text-gray-900 font-medium title-font break-words mb-1">
 							{word_en}
 						</p>
-						<span
-							data-micromodal-trigger="modal-23"
+						<button
+							onClick={handleClickAnswer}
 							className="text-xs px-2 py-1 rounded-sm border-solid border-indigo-500 border text-indigo-500"
 						>
 							答えを見る
-						</span>
+						</button>
 					</div>
 				</div>
 				<div className="w-1/4">
@@ -61,33 +58,7 @@ const Word: FC<Props> = (props) => {
 						</button>
 					</div>
 					<div className="text-right mt-2">
-						<button
-							onClick={handleClickAlart}
-							className="mx-auto text-white bg-red-500 border-0 py-1 px-4 focus:outline-none hover:bg-red-600 rounded text-sm"
-						>
-							削除
-						</button>
-						<Dialog
-							open={open}
-							onClose={handleCloseAlart}
-							aria-labelledby="単語削除"
-							aria-describedby="クリックした単語を削除します"
-						>
-							<DialogTitle id="alert-dialog-title">
-								{"本当に単語を削除しますか？"}
-							</DialogTitle>
-							<DialogContent>
-								<DialogContentText id="alert-dialog-description">
-									一度削除すると、元に戻せなくなります。
-								</DialogContentText>
-							</DialogContent>
-							<DialogActions>
-								<Button onClick={handleCloseAlart}>やっぱりやめる</Button>
-								<Button onClick={handleDeleteClick} autoFocus>
-									削除する
-								</Button>
-							</DialogActions>
-						</Dialog>
+						<Delete word_id={word_id} onDelete={onDelete} />
 					</div>
 				</div>
 				<div className="w-full text-right mt-3">
