@@ -5,6 +5,7 @@ export type Word = {
   word_ja: string;
   part_of_speech: number;
   memory: number;
+  memo: string;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

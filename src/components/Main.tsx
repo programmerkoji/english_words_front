@@ -103,6 +103,10 @@ const Main = () => {
 												key={word.id}
 												word_id={word.id}
 												word_en={word.word_en}
+												word_ja={word.word_ja}
+												part_of_speech={word.part_of_speech}
+												memory={word.memory}
+												memo={word.memo}
 												created_at={word.created_at}
 												onDelete={handleDelete}
 											/>

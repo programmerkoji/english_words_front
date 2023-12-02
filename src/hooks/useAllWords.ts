@@ -13,8 +13,8 @@ export const useAllWords = () => {
 
 	const fetchPost = async (currentPage: number) => {
 		try {
-			const responce = await axios.get<WordResponseApi>(`/words?page=${currentPage}`);
-			setWordsData(responce.data);
+			const response = await axios.get<WordResponseApi>(`/words?page=${currentPage}`);
+			setWordsData(response.data);
 		} catch (error) {
 			console.log(error);
 		}
