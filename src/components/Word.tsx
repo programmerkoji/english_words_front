@@ -18,6 +18,27 @@ type Props = {
 const Word: FC<Props> = (props) => {
 	const { word_id, word_en, created_at, onDelete, ...otherProps } = props;
 
+	const memory = otherProps.memory;
+
+	let memoryImageUrl = "";
+	let memoryColor = "";
+	switch (memory) {
+		case 0:
+			memoryImageUrl = "./images/smile_icon.svg";
+			memoryColor =
+				"w-8 h-8 inline-flex items-center justify-center rounded-full bg-green-500";
+			break;
+		case 1:
+			memoryImageUrl = "./images/usually_icon.svg";
+			memoryColor =
+				"w-8 h-8 inline-flex items-center justify-center rounded-full bg-yellow-500";
+			break;
+		case 2:
+			memoryImageUrl = "./images/cry_icon.svg";
+			memoryColor =
+				"w-8 h-8 inline-flex items-center justify-center rounded-full bg-red-500";
+			break;
+	}
 	const date = new Date(created_at);
 	const formattedCreatedData = date.toLocaleString("ja-JP", {
 		timeZone: "Asia/Tokyo",
@@ -27,12 +48,8 @@ const Word: FC<Props> = (props) => {
 		<li key={word_id} className="w-full xl:w-1/3 md:w-1/2 p-2">
 			<div className="border border-gray-200 p-3 rounded-lg flex flex-wrap items-center justify-between">
 				<div className="flex items-center gap-4 w-3/4">
-					<div className="w-8 h-8 inline-flex items-center justify-center rounded-full bg-yellow-500">
-						<img
-							src="https://from-forties.net/english-words/images/usually_icon.svg"
-							alt=""
-							className="w-5 h-5"
-						/>
+					<div className={memoryColor}>
+						<img src={memoryImageUrl} alt="" className="w-5 h-5" />
 					</div>
 					<div className="w-4/5">
 						<p className="text-lg text-gray-900 font-medium title-font break-words mb-1">
