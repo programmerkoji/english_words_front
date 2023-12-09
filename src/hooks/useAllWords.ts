@@ -9,7 +9,9 @@ export const useAllWords = () => {
 		data: [],
 		last_page: 0,
 		total: 0,
-  });
+	});
+	console.log(wordsData);
+	
 
 	const fetchPost = async (currentPage: number) => {
 		try {

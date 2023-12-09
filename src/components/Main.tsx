@@ -5,19 +5,46 @@ import { useAllWords } from "../hooks/useAllWords";
 import axios, { AxiosResponse } from "axios";
 import { WordResponseApi } from "../types/word";
 import { Create } from "./Create";
-import { Pagination } from "@mui/material";
+import { Alert, Pagination, Snackbar, SnackbarOrigin } from "@mui/material";
+
+interface State extends SnackbarOrigin {
+	open: boolean;
+}
+
+type responseData = {
+	status: number;
+	data: {message: string};
+}
 
 const Main = () => {
 	const { fetchPost, wordsData } = useAllWords();
 	const [page, setPage] = useState(1);
-	const [formData, setFormData] = useState({
+	const initialFormData = {
 		user_id: 1,
 		word_en: "",
 		word_ja: "",
 		part_of_speech: 0,
 		memory: 0,
 		memo: "",
+	};
+	const [formData, setFormData] = useState(initialFormData);
+	const [message, setMessage] = useState("");
+	const [state, setState] = React.useState<State>({
+		open: false,
+		vertical: "top",
+		horizontal: "center",
 	});
+	const { vertical, horizontal, open } = state;
+
+	const handleClose = (
+		event?: React.SyntheticEvent | Event,
+		reason?: string
+	) => {
+		if (reason === "clickaway") {
+			return;
+		}
+		setState({ ...state, open: false });
+	};
 
 	const handleChangePage = (
 		event: React.ChangeEvent<unknown>,
@@ -30,16 +57,33 @@ const Main = () => {
 	const handleCreateSubmit = async () => {
 		try {
 			const response: AxiosResponse = await axios.post("/words", formData);
-			console.log(response);
+			if (response.status === 200) {
+				const responseData = response.data;
+				setState({ ...state, open: true });
+				setMessage(responseData.message);
+			}
+			setFormData(initialFormData);
+			fetchPost(page);
 		} catch (error) {}
 	};
 
-	const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+	const onUpdateSuccess = (response: responseData) => {
+		if (response.status === 200) {
+			const responseData = response.data;
+			setState({ ...state, open: true });
+			setMessage(responseData.message);
+		}
+		fetchPost(page);
+	};
+
+	const handleInputChange = (
+		e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+	) => {
 		const { name, value } = e.target;
-		setFormData({
-			...formData,
+		setFormData((prevFormData) => ({
+			...prevFormData,
 			[name]: value,
-		});
+		}));
 	};
 
 	const handleDelete = async (word_id: number) => {
@@ -55,6 +99,18 @@ const Main = () => {
 
 	return (
 		<main>
+			<Snackbar
+				anchorOrigin={{ vertical, horizontal }}
+				open={open}
+				autoHideDuration={3000}
+				onClose={handleClose}
+				message={message}
+				key={vertical + horizontal}
+			>
+				<Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+					{message}
+				</Alert>
+			</Snackbar>
 			<div className="py-12">
 				<div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
 					<div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -62,7 +118,11 @@ const Main = () => {
 							<div className="text-gray-600 body-font">
 								<div className="mb-4"></div>
 								<div className="mb-6 flex items-center flex-wrap gap-4">
-									<Create formData={formData} handleCreateSubmit={handleCreateSubmit} handleInputChange={handleInputChange} />
+									<Create
+										formData={formData}
+										handleCreateSubmit={handleCreateSubmit}
+										handleInputChange={handleInputChange}
+									/>
 									<div className="md:ml-auto flex justify-end gap-2">
 										<select name="memory_search" id="memory_search">
 											<option value="">記憶度</option>
@@ -90,6 +150,7 @@ const Main = () => {
 												memo={word.memo}
 												created_at={word.created_at}
 												onDelete={handleDelete}
+												onUpdateSuccess={onUpdateSuccess}
 											/>
 										))}
 									</ul>
