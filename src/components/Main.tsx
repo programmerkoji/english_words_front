@@ -18,7 +18,6 @@ type responseData = {
 
 const Main = () => {
 	const { fetchPost, wordsData } = useAllWords();
-	const [page, setPage] = useState(1);
 	const initialFormData = {
 		user_id: 1,
 		word_en: "",
@@ -35,6 +34,12 @@ const Main = () => {
 		horizontal: "center",
 	});
 	const { vertical, horizontal, open } = state;
+
+	const getPageNumberFromSession = (): number => {
+		const pageNumber = sessionStorage.getItem('currentPage');
+		return pageNumber ? parseInt(pageNumber, 10) : 1;
+	}
+	const [page, setPage] = useState(getPageNumberFromSession());
 
 	const handleClose = (
 		event?: React.SyntheticEvent | Event,
@@ -94,6 +99,7 @@ const Main = () => {
 	};
 
 	useEffect(() => {
+		sessionStorage.setItem('currentPage', page.toString());
 		fetchPost(page);
 	}, [page]);
 

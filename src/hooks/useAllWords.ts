@@ -5,13 +5,11 @@ import { WordResponseApi } from "../types/word";
 
 export const useAllWords = () => {
 	const [wordsData, setWordsData] = useState<WordResponseApi>({
-		current_page: 0,
+		current_page: 1,
 		data: [],
-		last_page: 0,
+		last_page: 1,
 		total: 0,
 	});
-	console.log(wordsData);
-	
 
 	const fetchPost = async (currentPage: number) => {
 		try {
