@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import Header from "./organisms/layout/Header";
 import Nav from "./organisms/layout/Nav";
-import Main from "./components/Main";
+import { Main } from "./components/Main";
 import { FormDataProvider } from "./provider/FormDataProvider";
 // import Login from "./pages/Login";
 

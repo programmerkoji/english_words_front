@@ -6,3 +6,11 @@ export const PartOfSpeech: string[] = [
 	"熟語",
 ];
 export const Memory: string[] = ["覚えた", "たまに忘れる", "よく忘れる"];
+export const MemorySymbol: string[] = ["○", "△", "☓"];
+export const Sort = [
+	{
+		label: "新しい順",
+		value: 1,
+	},
+	{ label: "古い順", value: 2 }
+];

@@ -11,9 +11,20 @@ export const useAllWords = () => {
 		total: 0,
 	});
 
-	const fetchPost = async (currentPage: number) => {
+	const fetchPost = async (
+		currentPage: number,
+		memorySearch: string = "",
+		sort: number = 1
+	) => {
 		try {
-			const response = await axios.get<WordResponseApi>(`/words?page=${currentPage}`);
+			let url = `/words?page=${currentPage}`;
+			if (memorySearch) {
+				url += `&memorySearch=${memorySearch}`;
+			}
+			if (sort) {
+				url += `&sort=${sort}`;
+			}
+			const response = await axios.get<WordResponseApi>(url);
 			setWordsData(response.data);
 		} catch (error) {
 			console.log(error);

@@ -6,6 +6,7 @@ import axios, { AxiosResponse } from "axios";
 import { WordResponseApi } from "../types/word";
 import { Create } from "./Create";
 import { Alert, Pagination, Snackbar, SnackbarOrigin } from "@mui/material";
+import { Search, selectData } from "./Search";
 
 interface State extends SnackbarOrigin {
 	open: boolean;
@@ -13,10 +14,10 @@ interface State extends SnackbarOrigin {
 
 type responseData = {
 	status: number;
-	data: {message: string};
-}
+	data: { message: string };
+};
 
-const Main = () => {
+export const Main = () => {
 	const { fetchPost, wordsData } = useAllWords();
 	const initialFormData = {
 		user_id: 1,
@@ -36,10 +37,41 @@ const Main = () => {
 	const { vertical, horizontal, open } = state;
 
 	const getPageNumberFromSession = (): number => {
-		const pageNumber = sessionStorage.getItem('currentPage');
+		const pageNumber = sessionStorage.getItem("currentPage");
 		return pageNumber ? parseInt(pageNumber, 10) : 1;
-	}
+	};
 	const [page, setPage] = useState(getPageNumberFromSession());
+
+	const handleChangePage = (
+		event: React.ChangeEvent<unknown>,
+		newPage: number
+	) => {
+		setPage(newPage);
+		fetchPost(newPage);
+	};
+
+	const initialSelectData = {
+		memorySearch: "",
+		sort: 1,
+	};
+	const getSearchDataSession = () => {
+		const searchData = sessionStorage.getItem("searchData");
+		return searchData ? JSON.parse(searchData) : initialSelectData;
+	};
+	const [selectData, setSelectData] = useState<selectData>(getSearchDataSession());
+
+	const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+		const { name, value } = e.target;
+		setSelectData((prevSelectData) => ({
+			...prevSelectData,
+			[name]: value,
+		}));
+		handleSearchSubmit({ ...selectData, [name]: value });
+	};
+	const handleSearchSubmit = (selectData: selectData) => {
+		const { memorySearch, sort } = selectData;
+		fetchPost(page, memorySearch, sort);
+	};
 
 	const handleClose = (
 		event?: React.SyntheticEvent | Event,
@@ -49,14 +81,6 @@ const Main = () => {
 			return;
 		}
 		setState({ ...state, open: false });
-	};
-
-	const handleChangePage = (
-		event: React.ChangeEvent<unknown>,
-		newPage: number
-	) => {
-		setPage(newPage);
-		fetchPost(newPage);
 	};
 
 	const handleCreateSubmit = async () => {
@@ -69,7 +93,7 @@ const Main = () => {
 			}
 			setFormData(initialFormData);
 			fetchPost(page);
-		} catch (error) {}
+		} catch (error) { }
 	};
 
 	const onUpdateSuccess = (response: responseData) => {
@@ -95,12 +119,13 @@ const Main = () => {
 		try {
 			await axios.delete<WordResponseApi>(`/words/${word_id}`);
 			fetchPost(page);
-		} catch (error) {}
+		} catch (error) { }
 	};
 
 	useEffect(() => {
-		sessionStorage.setItem('currentPage', page.toString());
-		fetchPost(page);
+		sessionStorage.setItem("currentPage", page.toString());
+		sessionStorage.setItem('searchData', JSON.stringify(selectData));
+		fetchPost(page, selectData.memorySearch, selectData.sort);
 	}, [page]);
 
 	return (
@@ -129,36 +154,39 @@ const Main = () => {
 										handleCreateSubmit={handleCreateSubmit}
 										handleInputChange={handleInputChange}
 									/>
-									<div className="md:ml-auto flex justify-end gap-2">
-										<select name="memory_search" id="memory_search">
-											<option value="">記憶度</option>
-											<option value="1">○</option>
-											<option value="2">△</option>
-											<option value="3">☓</option>
-										</select>
-										<select name="sort" id="sort">
-											<option value="1">新しい順</option>
-											<option value="2">古い順</option>
-										</select>
-									</div>
+									<Search
+										selectData={selectData}
+										handleSelectChange={handleSelectChange}
+										handleSearchSubmit={handleSearchSubmit}
+									/>
 								</div>
 
 								<div className="container mx-auto">
 									<ul className="flex flex-wrap -m-2">
-										{wordsData.data.map((word) => (
-											<Word
-												key={word.id}
-												word_id={word.id}
-												word_en={word.word_en}
-												word_ja={word.word_ja}
-												part_of_speech={word.part_of_speech}
-												memory={word.memory}
-												memo={word.memo}
-												created_at={word.created_at}
-												onDelete={handleDelete}
-												onUpdateSuccess={onUpdateSuccess}
-											/>
-										))}
+										{wordsData.data.map(
+											({
+												id,
+												word_en,
+												word_ja,
+												part_of_speech,
+												memory,
+												memo,
+												created_at,
+											}) => (
+												<Word
+													key={id}
+													word_id={id}
+													word_en={word_en}
+													word_ja={word_ja}
+													part_of_speech={part_of_speech}
+													memory={memory}
+													memo={memo}
+													created_at={created_at}
+													onDelete={handleDelete}
+													onUpdateSuccess={onUpdateSuccess}
+												/>
+											)
+										)}
 									</ul>
 								</div>
 							</div>
@@ -176,5 +204,3 @@ const Main = () => {
 		</main>
 	);
 };
-
-export default Main;
